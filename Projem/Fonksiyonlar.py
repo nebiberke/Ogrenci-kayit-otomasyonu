@@ -5,7 +5,6 @@ db=sqlite3.connect('Kutuphane1.db')
 im=db.cursor()
 im.execute("CREATE TABLE IF NOT EXISTS Ogrenci ('Numara','Ad','Soyad','Dogum Tarihi','Sinif','Veli Adi',' Veli Telefon')")
 
-
 def bilgial():
     print("\n","-"*7,"Öğrenci bilgilerini giriniz","-"*7,"\n")
     numara=int(input("Öğrencinin numarası: "))

@@ -1,7 +1,6 @@
 import Fonksiyonlar
 import sqlite3
 import pandas as pd
-import numpy as np
 
 db=sqlite3.connect('Kutuphane1.db')
 im=db.cursor()
@@ -18,6 +17,7 @@ while True:
 2) Öğrenci sil
 3) Öğrenci bilgilerini güncelle
 4) Tüm öğrencileri listele
+5) Sınıf listesi oluştur
                  """)
         secim = int(input("Seçim yap: "))
         
@@ -34,6 +34,17 @@ while True:
             
             try:
                 ogrencidel=int(input("Silinecek öğreninin numarası: "))
+                veri=im.execute("SELECT * FROM Ogrenci").fetchall()
+                
+                for i in veri:
+                    if veri[veri.index(i)][0]==ogrencidel:
+                        Fonksiyonlar.ogrenciguncel(ogrencidel)
+                        Fonksiyonlar.ogrencisil(ogrencidel)
+                        print("\n")
+                        print("Öğrenci bilgileri başarıyla silindi")
+                        break
+                
+                
                 for i in GenelListe:
                     if GenelListe[GenelListe.index(i)]["Numarası"]==ogrencidel:
                         Fonksiyonlar.hangiogrenci(GenelListe,i)
@@ -42,10 +53,6 @@ while True:
                         print("\n")
                         print("Öğrenci başarıyla silindi")
                         break
-                else:
-                    print("\n")
-                    print("Girdiğiniz numarada öğrenci bulunamadı")
-                    
                         
             except ValueError:
                 print("\n")
@@ -65,16 +72,6 @@ while True:
                 else:
                     print("\n")
                     print("Girdiğiniz numarada öğrenci bulunamadı")
-                        
-                for i in GenelListe: 
-                    if GenelListe[GenelListe.index(i)]["Numarası"]==ogrenciguncel:
-                        Fonksiyonlar.hangiogrenci(GenelListe,i)
-                        GenelListe.pop(GenelListe.index(i))
-                        Fonksiyonlar.ogrenciguncel(ogrenciguncel)
-                        GenelListe.append(Fonksiyonlar.bilgial())
-                        print("\n")
-                        print("Öğrenci bilgileri başarıyla güncellendi")
-                        break
                 
                     
             except ValueError:
@@ -86,29 +83,51 @@ while True:
             if len(veri)==0:
                 print("\nLisetede hiç öğrenci yok")
             else:
+                numaralar=[]
+                adlar=[]
+                soyadlar=[]
+                tarihler=[]
+                siniflar=[]
+                veliadlar=[]
+                veliteller=[]
                 
                 for i in veri:
-                    numaralar=[]
-                    numaralar.append(veri[veri.index(i)][0])
-                    adlar=[]
-                    adlar.append(veri[veri.index(i)][1])
-                    soyadlar=[]
-                    soyadlar.append(veri[veri.index(i)][2])
-                    tarihler=[]
-                    tarihler.append(veri[veri.index(i)][3])
-                    siniflar=[]
-                    siniflar.append(veri[veri.index(i)][4])
-                    veliadlar=[]
-                    veliadlar.append(veri[veri.index(i)][5])
-                    veliteller=[]
-                    veliteller.append(veri[veri.index(i)][6])
-                    
+                   numaralar.append(veri[veri.index(i)][0])
+                   adlar.append(veri[veri.index(i)][1])
+                   soyadlar.append(veri[veri.index(i)][2])
+                   tarihler.append(veri[veri.index(i)][3])
+                   siniflar.append(veri[veri.index(i)][4])
+                   veliadlar.append(veri[veri.index(i)][5])
+                   veliteller.append(veri[veri.index(i)][6])
                    
+                  
                 sozluk = {'Numara':pd.Series(numaralar),'Ad':pd.Series(adlar),'Soyad':pd.Series(soyadlar),'Dogum Tarihi':pd.Series(tarihler),'Sınıf':pd.Series(siniflar),'Veli ad':pd.Series(veliadlar),
-                          'Veli tel':pd.Series(veliteller)}
+                                 'Veli tel':pd.Series(veliteller)}
                 veriler=pd.DataFrame(sozluk)
                 print(veriler)
-     
+                
+        elif secim==5:
+            siniflist=input("Hangi sınıfın listesi oluşturulacak: ")
+            print("\n")
+            veril=im.execute("SELECT * FROM Ogrenci WHERE Sinif = ?",[siniflist]).fetchall()
+            if len(veril)==0:
+                print("\nSınıfta hiç öğrenci yok")
+            else:
+                numaralar=[]
+                adlar=[]
+                soyadlar=[]
+                siniflar=[]
+
+                for i in veril:
+                   numaralar.append(veril[veril.index(i)][0])
+                   adlar.append(veril[veril.index(i)][1])
+                   soyadlar.append(veril[veril.index(i)][2])          
+                   siniflar.append(veril[veril.index(i)][4])
+
+                sozluk = {'Numara':pd.Series(numaralar),'Ad':pd.Series(adlar),'Soyad':pd.Series(soyadlar),'Sınıf':pd.Series(siniflar)}
+                veriler=pd.DataFrame(sozluk)
+                print(veriler)
+        
         else:
             print("\n")
             print("*"*7," LÜTFEN GEÇERLİ SEÇİM YAPINIZ ","*"*7)
@@ -132,7 +151,7 @@ while True:
         continue
     
 if len(GenelListe)==0:
-    print("Bugün yeni veri eklenmemiş")
+    print("\n Bugün okul listesinde veri değişikliği yapılmamış")
 else:
     #Günlük yapılan değişiklikleri gösterir
     Fonksiyonlar.rapor(GenelListe)
